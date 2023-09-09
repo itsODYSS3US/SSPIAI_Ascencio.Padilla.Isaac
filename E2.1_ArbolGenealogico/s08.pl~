@@ -1,0 +1,40 @@
+%E 2.1 Arbol genealogico
+
+hombre('Ulises').
+hombre('Carlos').
+hombre('Jaime').
+hombre('Juan').
+hombre('Sergio').
+hombre('Ricardo').
+
+mujer('Elvira').
+mujer('Estela').
+mujer('Maria').
+mujer('Araceli').
+mujer('Marta').
+mujer('Caral').
+mujer('Majo').
+
+
+%Progenitor
+progenitor('Estela','Ulises').
+progenitor('Estela','Jaime').
+
+%pareja('Sergio','Rosa').
+%pareja(P1,P2) :- pareja(P2,P1), !.
+
+padre(P,H) :- progenitor(P,H) , hombre(P).
+madre(M,H) :- progenitor(M,H) , mujer(M).
+
+hijo(H,P) :- progenitor(P,H) , hombre(H).
+
+abuelo(A,N) :- progenitor(A,P) , progenitor(P,N), hombres(A).
+abuelo_pat(A,N) :- padre(A,P), padre(P,N).
+abuelo_mat(A,N) :- padre(A,M), madre(M,N).
+
+abuela(A,N) :- progenitor(A,M), progenitor(M,N), mujer(A).
+abuela_pat(A,N) :- madre(A,P), padre(P,N).
+abuela_mat(A,N) :- madre(A,M), madre(M,N).
+
+abuelos_pat(Ao,Aa,N) :- abuelo_pat(Ao,N) , abuela_pat(Aa,N).
+abuelos_mat(Ao,Aa,N) :- abuelo_mat(Ao,N) , abuela_mat(Aa,N).
