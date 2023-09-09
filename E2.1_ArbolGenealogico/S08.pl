@@ -33,6 +33,11 @@ hombre('Ulises').
 hombre('Jaiden').
 hombre('Jerald').
 
+hombre('Alejandro').
+hombre('Chuy').
+hombre('Israel').
+hombre('Emanuel').
+
 mujer('Maria J').
 mujer('Maria').
 mujer('Mariana').
@@ -54,6 +59,10 @@ mujer('Alexa').
 mujer('Elizabeth').
 mujer('Dayana').
 mujer('Rocio').
+
+mujer('Rosa').
+mujer('Angelica').
+mujer('Fatima').
 
 
 %Progenitor
@@ -133,8 +142,15 @@ progenitor('Zaira','Eduardo').
 progenitor('Ricardo','Jaiden').
 progenitor('Ricardo','Jerald').
 
+%Parejas
 pareja('Sergio','Rosa').
-pareja(Fs,Pa) :- pareja(Pa,Fs).
+pareja('Araceli','Alejandro').
+pareja('Marta','Chuy').
+
+pareja('Cristian','Angelica').
+pareja('Miguel','Fatima').
+pareja('Jovana','Israel').
+pareja('Zaira','Emanuel').
 
 padre(P,H) :- progenitor(P,H) , hombre(P).
 madre(M,H) :- progenitor(M,H) , mujer(M).
@@ -165,14 +181,16 @@ tioabuelo(T,S) :- abuela(A,S) , hermanos(A,T), hombre(T).
 tiaabuela(T,S) :- abuelo(A,S) , hermanos(A,T), mujer(T).
 tiaabuela(T,S) :- abuela(A,S) , hermanos(A,T), mujer(T).
 
-tio(T,S) :- progenitor(P,S) , hermanos(T,P), T \= P, hombre(T).
-tia(T,S) :- progenitor(P,S) , hermanos(T,P), T \= P, mujer(T).
+tios(T,S) :- hermanos(P,T) , progenitor(P,S).
+tio(T,S) :- hermanos(P,T) , progenitor(P,S) , hombre(T).
+tia(T,S) :- hermanos(P,T) , progenitor(P,S) , mujer(T).
 
-%tio_politico(Tp,S) 
+tio_politico(Tp,S) :- tios(T,S) , pareja(T,Tp), hombre(Tp).
+tia_politica(Tp,S) :- tios(T,S) , pareja(T,Tp), mujer(Tp).
 
-%primos(P1,P2)
+primos(P1,P2) :- tios(T,P2) , progenitor(T,P1). 
 
-hermanos(H1,H2) :- progenitor(P,H1) , progenitor(P,H2), H1 \= H2.
+hermanos(H1,H2) :- progenitor(P,H1) , progenitor(P,H2) , H1 \= H2.
 
 
 
