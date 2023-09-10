@@ -86,7 +86,7 @@ progenitor('Saul','Diego').
 progenitor('Paloma','Lizbeth').
 progenitor('Paloma','Diego').
 
-progenitor('Jaun','Carlos').
+progenitor('Juan','Carlos').
 progenitor('Juan','Marta').
 progenitor('Juan','Araceli').
 progenitor('Juan','Sergio').
@@ -188,7 +188,7 @@ tia(T,S) :- hermanos(P,T) , progenitor(P,S) , mujer(T).
 tio_politico(Tp,S) :- tios(T,S) , pareja(T,Tp), hombre(Tp).
 tia_politica(Tp,S) :- tios(T,S) , pareja(T,Tp), mujer(Tp).
 
-primos(P1,P2) :- tios(T,P2) , progenitor(T,P1). 
+primos(P1,P2) :- tios(T,P2) , progenitor(T,P1).
 
 hermanos(H1,H2) :- progenitor(P,H1) , progenitor(P,H2) , H1 \= H2.
 
