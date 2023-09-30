@@ -4,7 +4,7 @@ bc :- consult('listas.pl').
 
 %Menú
 inicio :- nl,
-    write('---Menú---'), nl, 
+    write('---Menu---'), nl, 
     write('1. Listar'), nl, 
     write('2. Buscar'), nl, 
     write('3. Agregar'), nl, 
@@ -12,8 +12,9 @@ inicio :- nl,
     write('5. Ordenar'), nl, 
     write('6. Eliminar'), nl, 
     write('7. Concatenar'), nl, 
-    write('Ingresa una opción (1-7)'), nl, 
-    read(Op), opcion(Op).
+    write('8. Salir'), nl, 
+    write('Ingresa una opcion (1-8)'), nl, 
+    read(Op), opcion(Op), !.
 
 
 opcion(1) :- listar, inicio. 
@@ -23,12 +24,13 @@ opcion(4) :- contar_elementos, inicio.
 opcion(5) :- ordenar, inicio. 
 opcion(6) :- eliminar, inicio. 
 opcion(7) :- concatenar, inicio. 
-opcion(_) :- write('Revisa que el número ingresaso corresponda a una opción (1-7) '), inicio. 
+opcion(8) :- write('Fin de programa...'), !. 
+opcion(_) :- write('Revisa que el numero ingresado corresponda a una opcion (1-8) '), inicio. 
 
 
 
 %Listar
-listar :- write('Que lista va a mostrar: '),
+listar :- write('Que lista va a mostrar (volador, acuatico, domestico, venenoso, nocturno): '),
     nl, read(Tipo), animales(Tipo,Lista), imprimir(Lista).
 
 imprimir([]).
@@ -38,37 +40,47 @@ imprimir([H|T]) :- write('- '), write(H), nl,
 
 %Buscar
 buscar1(X,[_|T]) :- buscar1(X,T). 
-buscar1(H,[H|_]) :- write('El elemento si se encuentra en la lista'), nl.
+buscar1(H,[H|_]).
 
 buscar :- write('Que elemento desea buscar?: '),
     nl, read(Elemento), 
-    write('En lista se encuentre dicho elemento?: '),
+    write('En que lista se encuentra dicho elemento (volador, acuatico, domestico, venenoso, nocturno)?: '),
     nl, read(Tipo), buscar(Elemento,Tipo).
 
-buscar(Elemento,Tipo) :- animales(Tipo,Lista), buscar1(Elemento,Lista).
+buscar(Elemento,Tipo) :- animales(Tipo,Lista), buscar1(Elemento,Lista), write('El elemento si se encuentra en la lista'), nl.
+buscar(Elemento,Tipo) :- animales(Tipo,Lista), \+buscar1(Elemento,Lista),
+    write('El elemento no se encuentra en la lista'), nl,
+    write('Quiere agregar el elemento a esa lista? Si(s), No(n): '), nl, 
+    read(Op), opc(Op,Elemento,Tipo).
+
+opc(s,Elemento,Tipo) :- agregar(Elemento,Tipo).
+opc(n,_,_) :- !.
 
 %Agregar
 guardar :- tell('listas.pl'), listing(animales/2), told.
 insertar(E,L,Lr) :- Lr = [E|L].
 
-agregar :- write('Ingrese el elemento que desea agragar?: '),
+agregar :- write('Ingrese el elemento que desea agregar?: '),
     nl, read(Elemento), 
-    write('En que lista se va a agregar?: '),
+    write('En que lista se va a agregar? (volador, acuatico, domestico, venenoso, nocturno): '),
     nl, read(Tipo), agregar(Elemento,Tipo).
 
-agregar(Elemento,Tipo) :- animales(Tipo,Lista), 
+agregar(Elemento,Tipo) :- animales(Tipo,Lista),
+    \+buscar1(Elemento,Lista),
     insertar(Elemento,Lista,Lr),
     retract(animales(Tipo,Lista)),
     assertz(animales(Tipo,Lr)), 
     guardar, write('La base de conocimientos ha sido actualizada...'), nl.
-%assert(animales(Tipo,Lr))
 
+agregar(Elemento,Tipo) :- animales(Tipo,Lista),
+    buscar1(Elemento,Lista),
+    write('El elemento que desea agregar ya se encuentra en la lista'), nl.
 
 %Longitud listo
 longitud([], 0).
 longitud([_|T], L) :- longitud(T,L1), L is L1 + 1.
 
-contar_elementos :- write('Ingrese el tipo de la lista: '), 
+contar_elementos :- write('Ingrese el tipo de la lista: (volador, acuatico, domestico, venenoso, nocturno) '), 
     nl, read(Tipo), contar_elementos(Tipo,Cant), write('Los elementos en la lista '), write(Tipo), write(' son: '), write(Cant). 
 
 contar_elementos(Tipo,Cant) :-
@@ -76,20 +88,39 @@ contar_elementos(Tipo,Cant) :-
     longitud(Lista,Cant).
 
 %Ordenamiento listo - listar
-ordenar :- write('Ingresa el tipo que desea ordenar: '),
+ordenar :- write('Ingresa el tipo que desea ordenar: (volador, acuatico, domestico, venenoso, nocturno) '),
     nl, read(Tipo), ordenar(Tipo, Lr), write('La lista ordenada es la siguiente: '), nl, imprimir(Lr).
 
 ordenar(Tipo, Lr) :- animales(Tipo,Lista), msort(Lista, Lr).
 
 %Eliminar listo
-eliminar :- write('Que elemento desea eliminar?: '),
-    nl, read(Elemento), 
-    write('En lista se encuentre dicho elemento?: '),
-    nl, read(Tipo), eliminar(Elemento,Tipo).
-
-eliminar(Elemmento, Tipo) :- animales(Tipo,Lista), eliminar1(Elemento, Lista, T), imprimir(T). 
-
 eliminar1(R, [R|T], T) :- !.
 eliminar1(R, [H|T], [H|T2]) :- H \= R, eliminar1(R, T, T2).
 
+eliminar :- write('Que elemento desea eliminar?: '),
+    nl, read(Elemento), 
+    write('En que lista se encuentra dicho elemento?: (volador, acuatico, domestico, venenoso, nocturno) '),
+    nl, read(Tipo), eliminar(Elemento,Tipo).
+
+eliminar(Elemento, Tipo) :- animales(Tipo,Lista), 
+    buscar1(Elemento,Lista),
+    eliminar1(Elemento, Lista, T), 
+    retract(animales(Tipo,Lista)),
+    assertz(animales(Tipo,T)), 
+    guardar, write('El elemento ha sido eliminado...'), nl.
+
+eliminar(Elemento, Tipo) :- animales(Tipo,Lista), 
+    \+buscar1(Elemento,Lista),
+    write('El elemento que desea eliminar no se encuentra en la lista'), nl.
+
 %Concatenar 2 listas
+concatenar1([], L, L).
+concatenar1([H|T], L, [H|Result]) :- concatenar1(T, L, Result).
+
+concatenar :- write('Que lista desea concatenar: (volador, acuatico, domestico, venenoso, nocturno) '),
+    nl, read(Tipo1),
+    write('Con que lista se va a concatenar: (volador, acuatico, domestico, venenoso, nocturno) '),
+    nl, read(Tipo2), concatenar(Tipo1,Tipo2).
+
+concatenar(Tipo1,Tipo2) :- animales(Tipo1,Lista1), animales(Tipo2,Lista2),
+    concatenar1(Lista1,Lista2,Lr), imprimir(Lr).
