@@ -67,10 +67,54 @@ grafo(gnn,[a-i,a-b,a-d,
     b-c,b-e,
     d-e,d-i,
     e-f,
-    m-m]).
+    f-m]).
 
-grafo(aus,[ao-tn,ao-as,tn-q,tn-as,as-v,as-ngs,as-q,ngs-v,q-ngs]).
+grafo(aus,[ao-tn,ao-as,tn-q,tn-as,as-v,as-ngs,as-q,ngs-v,q-ngs,t-t]).
+
+grafo(gdn,[f>a,a>e,a>d,d>c,b>f,b>c]).
 
 vecino_nd(N1,N2,G) :- 
     grafo(G,L),
+    (member(N1-N2,L) ; member(N2-N1,L)) 
+    -> write('Son vecinos') ; write('No existe').
+
+vecino_d(N1,N2,G) :- 
+    grafo(G,L),
+    (member(N1>N2,L) ; member(N2>N1,L)).
+
+
+vecinos(N1,N2,G) :- 
+    grafo(G,L),
     (member(N1-N2,L) ; member(N2-N1,L)).
+
+% bagof devuelve una lista con los datos consultados
+    %bagof(N1,N2^vecinos(N1,N2,G), Ln).
+% setof devuelve una lista con los datos consultados y aplica sort
+vertices(G,Ln) :- 
+    setof(N1,N2^vecinos(N1,N2,G), Ln).
+
+listar_n(G) :-
+    grafo(G,L), nodos(L,[]).
+nodos([],Lr) :- sort(Lr, Lf), write(Lf).
+nodos([N1-N2|T],Lr) :- 
+    L1 = [N1|Lr],
+    L2 = [N2|L1],
+    nodos(T,L2).
+
+imprimir_ar(G,N) :-
+    grafo(G,L), nodos1(L,N).
+nodos1([],0).
+nodos1([H|T],N) :-
+    write(N), write(' - '), write(H), nl,
+    nodos1(T,N2), N is N2+1.
+
+ 
+recorrido(G,O,D,C) :- 
+    recorrido_aux(G,O,[D],C).
+recorrido_aux(_,O,[O|C1],[O|C1]).
+recorrido_aux(G,Ax,[Dx|C1],C) :-
+    vecinos(Nt,Dx,G),
+    not(member(Nt,[Dx|C1])),
+    recorrido_aux(G,Ax,[Nt,Dx|C1],C). 
+
+
