@@ -101,12 +101,12 @@ nodos([N1-N2|T],Lr) :-
     L2 = [N2|L1],
     nodos(T,L2).
 
-imprimir_ar(G,N) :-
-    grafo(G,L), nodos1(L,N).
+imprimir_ar(G) :-
+    grafo(G,L), nodos1(L,1).
 nodos1([],0).
 nodos1([H|T],N) :-
     write(N), write(' - '), write(H), nl,
-    nodos1(T,N2), N is N2+1.
+    N2 is N+1, nodos1(T,N2).
 
  
 recorrido(G,O,D,C) :- 
