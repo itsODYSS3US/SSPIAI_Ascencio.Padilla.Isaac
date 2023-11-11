@@ -9,7 +9,7 @@
 
 ;consulta para letra inicial y final
 ;first apellidos
-;first(second(second(second (second (second (second apellidos))))))
+;first( second( second( second (second (second (second apellidos))))))
 
 
 ;inorden - I, R, D
@@ -55,3 +55,39 @@
 
 
 ;busqueda
+(setf arbol '(1 ((2 ((3 nil) (4 nil ))) (d ((6 nil) (7 nil))))))
+
+;busqueda de un valor a partir de una lista en preorden
+(defun findval (val tree)
+    (setq arPre (preord tree))
+    (format t "Arbol en preorden ~a" arPre)
+    (if (find val arPre :test #'equal)
+        (write "Valor encontrado en el arbol")
+        (write "Este valor no existe en el arbol")
+    )
+)
+
+; (findval 4 arbol)
+; (findval 5 arbol) ;Error
+; (findval 'd arbol)
+; (findval 'A apellidos)
+
+; busqueda de un valor en el arbol, con recorrido en preorden
+(defun buscar (valor arbol)
+    (if (endp arbol)
+        nil
+    (let ((nodo (first arbol)))
+        (if (equal valor nodo)
+            (list nodo)  ; Si se encuentra el valor, agregarlo a la lista resultante
+            (append (buscar valor (first (second arbol)))  ; Buscar en el subárbol izquierdo
+                    (buscar valor (second (second arbol)))))))) ; Buscar en el subárbol derecho
+
+
+; buscar 'i apellidos
+; (I)
+
+; buscar 'h apellidos
+; NIL
+
+; buscar 4 arbol
+; (4)
